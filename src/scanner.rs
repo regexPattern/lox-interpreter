@@ -121,7 +121,33 @@ impl Scanner {
                 },
                 '/' => match chars.peek() {
                     Some('/') => {
-                        chars.find(|&c| c == '\n');
+                        while let Some(c) = chars.next() {
+                            if c == '\n' {
+                                line += 1;
+                            }
+                        }
+                        continue;
+                    }
+                    Some('*') => {
+                        let mut nesting = 1;
+                        while let Some(curr) = chars.next() {
+                            match (curr, chars.peek()) {
+                                ('\n', _) | (_, Some('\n')) => line += 1,
+                                ('*', Some('/')) => {
+                                    nesting -= 1;
+                                    chars.next();
+
+                                    if nesting == 0 {
+                                        break;
+                                    }
+                                }
+                                ('/', Some('*')) => {
+                                    nesting += 1;
+                                    chars.next();
+                                }
+                                _ => continue,
+                            }
+                        }
                         continue;
                     }
                     _ => TokenKind::Slash,

@@ -42,5 +42,7 @@ pub fn run(source: String) -> anyhow::Result<()> {
     let scanner = Scanner::from(source);
     let tokens = scanner.scan_tokens();
 
+    dbg!(tokens);
+
     Ok(())
 }
